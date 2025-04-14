@@ -13,12 +13,33 @@ interface PlanFormProps {
   onSuccess?: () => void;
   onCancel?: () => void;
   isModal?: boolean;
+  initialValues?: PlanItem;
+  isEdit?: boolean;
 }
 
-const PlanForm: React.FC<PlanFormProps> = ({ onSuccess, onCancel, isModal = false }) => {
+const PlanForm: React.FC<PlanFormProps> = ({ 
+  onSuccess, 
+  onCancel, 
+  isModal = false,
+  initialValues,
+  isEdit = false
+}) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Set initial values if editing
+  React.useEffect(() => {
+    if (initialValues && isEdit) {
+      form.setFieldsValue({
+        title: initialValues.title,
+        destination: initialValues.destination,
+        dateRange: [dayjs(initialValues.startDate), dayjs(initialValues.endDate)],
+        participants: initialValues.participants,
+        budget: initialValues.budget,
+      });
+    }
+  }, [form, initialValues, isEdit]);
 
   const onFinish = (values: any) => {
     setLoading(true);
@@ -27,8 +48,7 @@ const PlanForm: React.FC<PlanFormProps> = ({ onSuccess, onCancel, isModal = fals
       // Extract date range and format dates
       const [startDate, endDate] = values.dateRange;
       
-      // Create new plan
-      const newPlan: Omit<PlanItem, 'id'> = {
+      const planData = {
         title: values.title,
         destination: values.destination,
         startDate: startDate.format('YYYY-MM-DD'),
@@ -37,11 +57,16 @@ const PlanForm: React.FC<PlanFormProps> = ({ onSuccess, onCancel, isModal = fals
         budget: values.budget,
         status: 'not_started',
       };
-      
-      // Add to store
-      const createdPlan = plansStore.addPlan(newPlan);
-      
-      message.success('旅行计划创建成功！');
+
+      if (isEdit && initialValues) {
+        // Update existing plan
+        plansStore.updatePlan(initialValues.id, planData);
+        message.success('旅行计划更新成功！');
+      } else {
+        // Create new plan
+        const createdPlan = plansStore.addPlan(planData);
+        message.success('旅行计划创建成功！');
+      }
       
       // Reset form
       form.resetFields();
@@ -50,10 +75,10 @@ const PlanForm: React.FC<PlanFormProps> = ({ onSuccess, onCancel, isModal = fals
       if (onSuccess) {
         onSuccess();
       } else if (!isModal) {
-        navigate(`/plans/${createdPlan.id}`);
+        navigate(`/plans`);
       }
     } catch (error) {
-      message.error('创建失败，请重试');
+      message.error(isEdit ? '更新失败，请重试' : '创建失败，请重试');
       console.error(error);
     } finally {
       setLoading(false);
@@ -138,7 +163,7 @@ const PlanForm: React.FC<PlanFormProps> = ({ onSuccess, onCancel, isModal = fals
             </Button>
           )}
           <Button type="primary" htmlType="submit" loading={loading}>
-            创建行程
+            {isEdit ? '保存修改' : '创建行程'}
           </Button>
         </div>
       </Form.Item>

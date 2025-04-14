@@ -14,6 +14,7 @@ import PlanDetail from './pages/Plans/PlanDetail';
 import NewPlan from './pages/Plans/NewPlan';
 import { observer } from 'mobx-react-lite';
 import { authStore } from './stores/authStore';
+import AIChat from './components/AIChat';
 
 const { Content } = Layout;
 
@@ -23,7 +24,10 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <Header />
       <Layout>
         <Sidebar />
-        <Content className="p-6 bg-gray-50">{children}</Content>
+        <Content className="p-6 bg-gray-50">
+          {children}
+          <AIChat />
+        </Content>
       </Layout>
     </Layout>
   );

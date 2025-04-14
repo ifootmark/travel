@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Table, Tag, Button, Space } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { MapPin, Calendar, Users, MoreHorizontal, Eye, Footprints } from 'lucide-react';
+import { MapPin, Calendar, Users, MoreHorizontal, Eye, Footprints, Edit } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import FootprintModal from '../FootprintModal';
+import PlanModal from '../PlanModal';
 
 export interface PlanItem {
   id: string;
@@ -35,11 +36,17 @@ interface PlanListProps {
 
 const PlanList: React.FC<PlanListProps> = ({ data, loading }) => {
   const [footprintModalVisible, setFootprintModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<PlanItem | null>(null);
   
   const handleShowFootprints = (plan: PlanItem) => {
     setSelectedPlan(plan);
     setFootprintModalVisible(true);
+  };
+
+  const handleEdit = (plan: PlanItem) => {
+    setSelectedPlan(plan);
+    setEditModalVisible(true);
   };
 
   const columns: ColumnsType<PlanItem> = [
@@ -112,7 +119,7 @@ const PlanList: React.FC<PlanListProps> = ({ data, loading }) => {
               详情
             </Button>
           </Link>
-          {record.status === 'completed' && (
+          {(record.status === 'completed' || record.status === 'in_progress') && (
             <Button 
               type="link" 
               className="flex items-center text-purple-600"
@@ -120,6 +127,16 @@ const PlanList: React.FC<PlanListProps> = ({ data, loading }) => {
             >
               <Footprints className="w-4 h-4 mr-1" />
               我的足迹
+            </Button>
+          )}
+          {record.status === 'not_started' && (
+            <Button
+              type="link"
+              className="flex items-center text-green-600"
+              onClick={() => handleEdit(record)}
+            >
+              <Edit className="w-4 h-4 mr-1" />
+              编辑
             </Button>
           )}
           <Button type="link" className="flex items-center">
@@ -148,6 +165,13 @@ const PlanList: React.FC<PlanListProps> = ({ data, loading }) => {
         visible={footprintModalVisible}
         onClose={() => setFootprintModalVisible(false)}
         plan={selectedPlan}
+      />
+
+      <PlanModal
+        visible={editModalVisible}
+        onClose={() => setEditModalVisible(false)}
+        plan={selectedPlan}
+        isEdit={true}
       />
     </>
   );
