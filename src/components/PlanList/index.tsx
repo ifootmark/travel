@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, Tag, Button, Space } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { MapPin, Calendar, Users, MoreHorizontal } from 'lucide-react';
+import { MapPin, Calendar, Users, MoreHorizontal, Eye, Footprints } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import FootprintModal from '../FootprintModal';
 
 export interface PlanItem {
   id: string;
@@ -32,6 +34,14 @@ interface PlanListProps {
 }
 
 const PlanList: React.FC<PlanListProps> = ({ data, loading }) => {
+  const [footprintModalVisible, setFootprintModalVisible] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<PlanItem | null>(null);
+  
+  const handleShowFootprints = (plan: PlanItem) => {
+    setSelectedPlan(plan);
+    setFootprintModalVisible(true);
+  };
+
   const columns: ColumnsType<PlanItem> = [
     {
       title: '行程名称',
@@ -94,8 +104,24 @@ const PlanList: React.FC<PlanListProps> = ({ data, loading }) => {
     {
       title: '操作',
       key: 'action',
-      render: () => (
+      render: (_, record) => (
         <Space>
+          <Link to={`/plans/${record.id}`}>
+            <Button type="link" className="flex items-center text-blue-600">
+              <Eye className="w-4 h-4 mr-1" />
+              详情
+            </Button>
+          </Link>
+          {record.status === 'completed' && (
+            <Button 
+              type="link" 
+              className="flex items-center text-purple-600"
+              onClick={() => handleShowFootprints(record)}
+            >
+              <Footprints className="w-4 h-4 mr-1" />
+              我的足迹
+            </Button>
+          )}
           <Button type="link" className="flex items-center">
             <MoreHorizontal className="w-4 h-4" />
           </Button>
@@ -105,17 +131,25 @@ const PlanList: React.FC<PlanListProps> = ({ data, loading }) => {
   ];
 
   return (
-    <Table
-      columns={columns}
-      dataSource={data}
-      loading={loading}
-      rowKey="id"
-      pagination={{
-        pageSize: 10,
-        showSizeChanger: true,
-        showQuickJumper: true,
-      }}
-    />
+    <>
+      <Table
+        columns={columns}
+        dataSource={data}
+        loading={loading}
+        rowKey="id"
+        pagination={{
+          pageSize: 10,
+          showSizeChanger: true,
+          showQuickJumper: true,
+        }}
+      />
+      
+      <FootprintModal 
+        visible={footprintModalVisible}
+        onClose={() => setFootprintModalVisible(false)}
+        plan={selectedPlan}
+      />
+    </>
   );
 };
 

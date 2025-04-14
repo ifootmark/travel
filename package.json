@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@amap/amap-jsapi-loader": "^1.0.1",
     "antd": "^5.14.2",
     "axios": "^1.6.7",
+    "dayjs": "^1.11.10",
     "echarts": "^5.5.0",
     "lucide-react": "^0.344.0",
     "mobx": "^6.12.0",

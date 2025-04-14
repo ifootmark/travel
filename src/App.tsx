@@ -10,6 +10,8 @@ import AllPlans from './pages/Plans/AllPlans';
 import CompletedPlans from './pages/Plans/CompletedPlans';
 import InProgressPlans from './pages/Plans/InProgressPlans';
 import NotStartedPlans from './pages/Plans/NotStartedPlans';
+import PlanDetail from './pages/Plans/PlanDetail';
+import NewPlan from './pages/Plans/NewPlan';
 import { observer } from 'mobx-react-lite';
 import { authStore } from './stores/authStore';
 
@@ -58,6 +60,14 @@ function App() {
             }
           />
           <Route
+            path="/plans/new"
+            element={
+              <PrivateRoute>
+                <NewPlan />
+              </PrivateRoute>
+            }
+          />
+          <Route
             path="/plans/completed"
             element={
               <PrivateRoute>
@@ -78,6 +88,14 @@ function App() {
             element={
               <PrivateRoute>
                 <NotStartedPlans />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/plans/:id"
+            element={
+              <PrivateRoute>
+                <PlanDetail />
               </PrivateRoute>
             }
           />
