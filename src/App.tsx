@@ -12,6 +12,7 @@ import InProgressPlans from './pages/Plans/InProgressPlans';
 import NotStartedPlans from './pages/Plans/NotStartedPlans';
 import PlanDetail from './pages/Plans/PlanDetail';
 import NewPlan from './pages/Plans/NewPlan';
+import Profile from './pages/Profile';
 import { observer } from 'mobx-react-lite';
 import { authStore } from './stores/authStore';
 import AIChat from './components/AIChat';
@@ -100,6 +101,14 @@ function App() {
             element={
               <PrivateRoute>
                 <PlanDetail />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
               </PrivateRoute>
             }
           />

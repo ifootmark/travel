@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Table, Tag, Button, Space } from 'antd';
+import { Table, Tag, Button, Space, Popconfirm, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { MapPin, Calendar, Users, MoreHorizontal, Eye, Footprints, Edit } from 'lucide-react';
+import { MapPin, Calendar, Users, MoreHorizontal, Eye, Footprints, Edit, Trash } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import FootprintModal from '../FootprintModal';
 import PlanModal from '../PlanModal';
+import { plansStore } from '../../stores/plansStore';
 
 export interface PlanItem {
   id: string;
@@ -48,14 +49,27 @@ const PlanList: React.FC<PlanListProps> = ({ data, loading }) => {
     setSelectedPlan(plan);
     setEditModalVisible(true);
   };
+  
+  const handleDelete = (id: string) => {
+    try {
+      plansStore.deletePlan(id);
+      message.success('行程删除成功');
+    } catch (error) {
+      message.error('删除失败，请重试');
+    }
+  };
 
   const columns: ColumnsType<PlanItem> = [
     {
       title: '行程名称',
       dataIndex: 'title',
       key: 'title',
-      render: (text) => (
-        <div className="font-medium">{text}</div>
+      render: (text, record) => (
+        <div className="font-medium">      
+          <Link to={`/plans/${record.id}`}>
+            {text}
+          </Link>
+        </div>
       ),
     },
     {
@@ -125,8 +139,7 @@ const PlanList: React.FC<PlanListProps> = ({ data, loading }) => {
               className="flex items-center text-purple-600"
               onClick={() => handleShowFootprints(record)}
             >
-              <Footprints className="w-4 h-4 mr-1" />
-              我的足迹
+              <Footprints className="w-4 h-4 mr-1" />足迹
             </Button>
           )}
           {record.status === 'not_started' && (
@@ -135,13 +148,24 @@ const PlanList: React.FC<PlanListProps> = ({ data, loading }) => {
               className="flex items-center text-green-600"
               onClick={() => handleEdit(record)}
             >
-              <Edit className="w-4 h-4 mr-1" />
-              编辑
+              <Edit className="w-4 h-4 mr-1" />编辑
             </Button>
           )}
-          <Button type="link" className="flex items-center">
-            <MoreHorizontal className="w-4 h-4" />
-          </Button>
+          <Popconfirm
+            title="确定要删除此行程吗？"
+            description="此操作不可撤销"
+            onConfirm={() => handleDelete(record.id)}
+            okText="确定"
+            cancelText="取消"
+          >
+            <Button 
+              type="link" 
+              danger
+              className="flex items-center"
+            >
+              <Trash className="w-4 h-4 mr-1" />删除
+            </Button>
+          </Popconfirm>
         </Space>
       ),
     },

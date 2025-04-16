@@ -20,6 +20,7 @@ const Header: React.FC = () => {
       key: 'profile',
       label: '个人中心',
       icon: <User className="w-4 h-4" />,
+      onClick: () => navigate('/profile'),
     },
     {
       type: 'divider',
